@@ -112,119 +112,163 @@ document.getElementById("initRobot").addEventListener("click", function () {
       instValue.push(instDates.slice(i, i + 1));
     }
 
-    initRobot(plataforma, posicion, instValue)
+    initRobot(cordX, cordY, instValue)
   }
 })
 
 
+
+var i = 0;
+var aviso = document.getElementById("aviso");
+var exit = true;
+
+
 /**
- * @param  {number} plataforma - Platform dimension
- * @param  {string} posicion - Robot´s initial position 
+ * @param  {number} cordX - Platform dimension
+ * @param  {number} cordY - Robot´s initial position 
  * @param  {object} instValue - Robot´s instructions
  */
 
-function initRobot(plataforma, posicion, instValue) {
+async function initRobot(cordX, cordY, instValue) {
 
-  var cordX = parseInt(posicion.split(' ')[0]);
-  var cordY = parseInt(posicion.split(' ')[1]);
-  var direct = posicion.split(' ')[2];
-  var aviso = document.getElementById("aviso");
-  var exit = true;
+  var px = robot.style.left.indexOf("p");
+  var finalRobot = robot.style.left.slice(0, px);
+  var leftPosition = parseInt(finalRobot);
+  let prueba = await instValue[i];
+  let ejecutor = setTimeout(() => {
 
-  for (var i of instValue) {
-    if (exit === true) {
-      if (i === "M") {
-        switch (direct) {
+   if (exit === true) {
+      if (prueba === "M") {
+        switch (directFinal) {
           case "N":
             if (cordY + 1 <= plataforma) {
               cordY++
               robot.style.top = resultY * -cordY + "px";
+              i = i + 1;
+              initRobot(cordX, cordY, instValue);
             }
             else {
               aviso.innerText = "El robot se caería de la plataforma";
               exit = false;
             }
             break;
+
           case "S":
             if (cordY - 1 >= 1) {
               cordY--
               robot.style.top = resultY * -cordY + "px";
+              i = i + 1;
+              initRobot(cordX, cordY, instValue);
             }
             else {
               aviso.innerText = "El robot se caería de la plataforma";
               exit = false;
             }
             break;
+
           case "E":
             if (cordX + 1 <= plataforma) {
-              robot.style.left = (resultX * cordX) - 120 + "px";
+              robot.style.left = leftPosition + resultX + "px";
               cordX++
+              i = i + 1;
+              initRobot(cordX, cordY, instValue);
             }
             else {
               aviso.innerText = "El robot se caería de la plataforma";
               exit = false;
             }
             break;
+
 
           case "O":
             if (cordX - 1 <= plataforma && cordX - 1 > 0) {
               cordX--
-              robot.style.left = (resultX * -cordX) + 60 + "px";
+              robot.style.left = leftPosition - resultX + "px";
+              i = i + 1;
+              initRobot(cordX, cordY, instValue);
             }
             else {
               aviso.innerText = "El robot se caería de la plataforma";
               exit = false;
             }
             break;
+
         }
       }
 
-      if (i === "R") {
-        switch (direct) {
+      if (prueba === "R") {
+        switch (directFinal) {
           case "N":
             robot.style.transform = 'rotate(90deg)';
-            direct = "E";
+            directFinal = "E";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
             break;
+
           case "S":
             robot.style.transform = 'rotate(270deg)';
-            direct = "O";
+            directFinal = "O";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
             break;
+
           case "E":
             robot.style.transform = 'rotate(180deg)';
-            direct = "S";
+            directFinal = "S";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
+            break;
+
+
+          case "O":
+            robot.style.transform = 'rotate(360deg)';
+            directFinal = "N";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
+            break;
+
+        }
+      }
+
+      if (prueba === "L") {
+        switch (directFinal) {
+          case "N":
+            robot.style.transform = 'rotate(-90deg)';
+            directFinal = "O";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
+            break;
+
+          case "S":
+            robot.style.transform = 'rotate(-270deg)';
+            directFinal = "E";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
+            break;
+
+          case "E":
+            robot.style.transform = 'rotate(-360deg)';
+            directFinal = "N";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
             break;
 
           case "O":
-            robot.style.transform = 'rotate(0deg)';
-            direct = "N";
+            robot.style.transform = 'rotate(-180deg)';
+            directFinal = "S";
+            i = i + 1;
+            initRobot(cordX, cordY, instValue);
             break;
+
         }
       }
 
-      if (i === "L") {
-        switch (direct) {
-          case "N":
-            robot.style.transform = 'rotate(270deg)';
-            direct = "O";
-            break;
-          case "S":
-            robot.style.transform = 'rotate(90deg)';
-            direct = "E";
-            break;
-          case "E":
-            robot.style.transform = 'rotate(0deg)';
-            direct = "N";
-            break;
-
-          case "O":
-            robot.style.transform = 'rotate(180deg)';
-            direct = "S";
-            break;
-        }
-      }
     }
-  }
+  }, 3000)
 
+  ejecutor
+  
+  aviso.innerText = cordX +" / "+ cordY +" / "+ directFinal;
 
 }
 
